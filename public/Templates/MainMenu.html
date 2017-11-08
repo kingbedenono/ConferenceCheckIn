@@ -1,0 +1,371 @@
+{{#with user}}
+<div class="w3-row">
+    <div class="w3-container w3-third">
+        <p id="id_to_hide"> {{Participant_id}}</p>
+        <p id="admin_to_hide">{{IsAdmin}}</p>
+        <img id ="mypp" src="images/LOGO.png" class="w3-image"/>
+    </div>
+    <div class="w3-container w3-twothird">
+        <marquee>
+            <h3 class="w3-text-white" >Welcome {{Fname}}</h3>
+        </marquee>
+        <div style="float : left" >
+            <img src = "images/logo2.png" class="w3-image" />
+        </div>
+        <div style="float : right;">
+            <button onclick="showProfile()">
+            <img  src="/uploads/{{Img}}" alt="your image" width="150" height="150"/>
+        </button>
+        </div>
+    </div>
+</div>
+{{/with}}
+<br>
+<center class="w3-mobile">
+    <div class="w3-row">
+        <div class="w3-bar">
+            <button class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white" style="width:12%" onclick="ConferenceList()">Conference List</button>
+            <button onclick="showProfile()" style="width:12%" class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white">My profile </button>
+            <button class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white" style="width:12%" onclick ="stat()">My Stats</button>
+            <button id = "ManageConference"class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white" style="width:12%" onclick ="ManageConf()" >Manage Conference</button>
+            <button id="Admin_checkIn" class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white" style="width:12%" onclick="CheckIn()">Check in people</button>
+            <button id ="adminstats" class="w3-button w3-blue w3-mobile w3-bottombar w3-border-white" style="width:12%" onclick ="AdminStats()" >My Admin stats</button>
+
+        </div>
+    </div>
+</center>
+<br>
+<app-container> </app-container>
+
+<script>
+    $('#id_to_hide').hide();
+    $('#admin_to_hide').hide();
+    function ManageConf(){
+        var ractive = new Ractive({
+                    el: 'app-container',
+                    template: Admin,
+                    init: function(options) {
+
+                    }
+                });
+    }
+    function stat(){
+        val = $('#id_to_hide').text();
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "Get",
+            url: "/stats/" + val,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var ractive = new Ractive({
+                    el: 'app-container',
+                    template: mystats,
+                    init: function(options) {
+                        $("#Mystats").ejGrid({
+                            dataSource: data,
+                            allowPaging: true,
+                            allowSorting: true,
+                            isResponsive: true,    
+                            toolbarSettings: {showToolbar: true, toolbarItems: [ej.Grid.ToolBarItems.Search] },            
+                            columns: [
+                                    { field: "Conference_name", headerText: "Conference name" , textAlign: ej.TextAlign.Right},
+                                    { field: "date", headerText: "conference Date"},
+                                    { field: "Registered", headerText: "You register on"},
+                                    { field: "Checkin", headerText: "You check in on"}
+                            ]
+                        });
+                    }  
+                });
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+            }
+        });
+        
+    }
+    
+    function AdminStats(){
+        val = $('#id_to_hide').text();
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "Get",
+            url: "/adminstat/" + val,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var ractive = new Ractive({
+                    el: 'app-container',
+                    template: mystats,
+                    init: function(options) {
+                        $("#Mystats").ejGrid({
+                            dataSource: data,
+                            allowPaging: true,
+                            allowSorting: true,
+                            isResponsive: true,
+                            toolbarSettings: {showToolbar: true, toolbarItems: [ej.Grid.ToolBarItems.Search] },                
+                            columns: [
+                                    { field: "Conference_name", headerText: "Conference name" , textAlign: ej.TextAlign.Right},
+                                    { field: "date", headerText: "conference Date"},
+                                    { field: "registered", headerText: "Number of registration"},
+                                    { field: "checked", headerText: "Number of present"}
+                            ]
+                        });
+                    }  
+                });
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+            }
+        });
+        
+    }
+    
+    function showProfile() {
+        val = $('#id_to_hide').text();
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "Post",
+            url: "/admin/" + val,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var ractive = new Ractive({
+                    el: 'app-container',
+                    template: profile,
+                    init: function(options) {
+
+                    },
+                    data: {
+                        user: data[0]
+                    }
+                });
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+            }
+
+        });
+    }
+    function showListForNotAdmin(data){
+        var ractive = new Ractive({
+                        el: 'app-container',
+                        template: conference,
+                        init: function(options) {
+                            $('#showConf').ejGrid({
+                                dataSource: data,
+                                allowPaging: true,
+                                allowSorting: true,
+                                allowTextWrap: true,
+                                recordDoubleClick: function(args) {
+                                    var rowdata = args.data;
+                                    var val = rowdata.conference_id;
+                                    ShowConferenceDetails(val);
+                                },
+                                toolbarSettings: {
+                                    showToolbar: true,
+                                    toolbarItems: [ej.Grid.ToolBarItems.Search]
+                                },
+
+                                columns: [{
+                                    field: "conference_id",
+                                    headerText: "conference_id",
+                                    isPrimaryKey: true,
+                                    visible: false
+                                }, {
+                                    field: "Conference_name",
+                                    headerText: "Conference Name"
+                                }, {
+                                    field: "Date",
+                                    headerText: "Date",
+                                    editType: "datepicker",
+                                    format: "{0:MM/dd/yyyy}",
+                                    editParams: {
+                                        buttonText: "Now"
+                                    }
+                                }, {
+                                    field: "Start_time",
+                                    headerText: "Start Time"
+                                }, {
+                                    field: "End_time",
+                                    headerText: "End Time"
+                                }, {
+                                    field: "Guest_speaker",
+                                    headerText: "Guest Speaker"
+                                }, {
+                                    field: "Location",
+                                    headerText: "Location"
+                                }
+                                ]
+                            });
+                        }
+
+                    });
+    }
+    function showListForAdmin(data){
+        var ractive = new Ractive({
+                        el: 'app-container',
+                        template: conference,
+                        init: function(options) {
+                            $('#showConf').ejGrid({
+                                dataSource: data,
+                                allowPaging: true,
+                                allowSorting: true,
+                                allowTextWrap: true,
+                                filterSettings: {
+                                    showFilterBarStatus: true,
+                                    statusBarWidth: 500
+                                },
+                                columns: [{
+                                    field: "conference_id",
+                                    headerText: "conference_id",
+                                    isPrimaryKey: true,
+                                    visible: false
+                                }, {
+                                    field: "Conference_name",
+                                    headerText: "Conference Name"
+                                }, {
+                                    field: "Date",
+                                    headerText: "Date",
+                                    editType: "datepicker",
+                                    format: "{0:MM/dd/yyyy}",
+                                    editParams: {
+                                        buttonText: "Now"
+                                    }
+                                },{
+                                    field: "Place_available",
+                                    headerText: "Place available"
+                                }, 
+                                {
+                    headerText: "Conference Details",
+                    commands: [{
+                        type: "details",
+                        buttonOptions: {
+                            text: "Details",
+                            width: "100",
+                            click: "onClick"
+                        }
+                    }],
+                    isUnbound: true,
+                    textAlign: ej.TextAlign.Left,
+                    width: 150
+                }
+                                ]
+                            });
+                        }
+
+                    });
+
+
+    }
+    var dataToTest;
+    function ConferenceList() {
+        val = $('#admin_to_hide').text();
+            $.ajax({
+                async: false,
+                cache: false,
+                type: "Get",
+                url: "/conf/",
+                dataType: 'json',
+                contentType: "application/json",
+                success: function(data) {
+                    dataToTest = data;
+                    var ractive = new Ractive({
+                        el: 'app-container',
+                        template: conference,
+                        init: function(options) {
+                            $("#showConf").ejGrid({
+                                dataSource: data,
+                                allowPaging: true,
+                                allowSorting: true,
+                                allowTextWrap: true,
+                                isResponsive: true,
+                                toolbarSettings: {showToolbar: true, toolbarItems: [ej.Grid.ToolBarItems.Search] },                
+                                detailsTemplate: "#tabGridContents",
+                                detailsDataBound: "detailGridData",
+                                columns: [
+                                    {
+                                    field: "conference_id",
+                                    headerText: "conference_id",
+                                    isPrimaryKey: true,
+                                    visible: false
+                                }, {
+                                    field: "Conference_name",
+                                    headerText: "Conference Name"
+                                }, {
+                                    field: "Date",
+                                    headerText: "Date"
+                                },{
+                                    field: "Place_available",
+                                    headerText: "Place available"
+                                }, {
+                                    headerText : "Register",
+                                    width : 100,
+                                    template : "<input type='button' value='Register' onclick ='Goreg()' />"
+                                }
+                                        ]
+                            });
+
+                            
+                        }
+                    });
+                },
+                error: function(error) {
+                    alert("An error happened try again later !!!");
+                }
+            });
+        
+    }
+
+    function detailGridData(e) {
+        var filteredData = e.data["conference_id"];
+        
+        var data = ej.DataManager(dataToTest).executeLocal(ej.Query().where("conference_id", "equal", parseInt(filteredData), true));
+        e.detailsElement.find("#detailGrid").ejGrid({
+            dataSource: data,
+            allowSelection: false,
+            columns: [
+                     { field: "Descrition1",headerText: "Description", width: 80, textAlign: ej.TextAlign.left },
+
+            ]
+        });
+    }
+
+    function CheckIn() {
+        var ractive = new Ractive({
+            el: 'app-container',
+            template: checkIn,
+            init: function(options) {
+                var creator = $('#id_to_hide').text();
+                $.ajax({
+                async: false,
+                cache: false,
+                type: "Get",
+                url: "/Adminconf/" + creator,
+                dataType: 'json',
+                contentType: "application/json",
+                success: function(data) {
+                    $('#Conferencess').find('option').remove().end();
+                    $('#Conferencess').append($('<option>', {
+                            value: 0,
+                            text: "Select one..."
+                        }));
+                    for (i = 0; i < data.length; i++) {
+                        $('#Conferencess').append($('<option>', {
+                            value: data[i].conference_id,
+                            text: data[i].Conference_name + "  @  " + data[i].Date
+                        }));
+                    }
+                },
+                error: function(error) {
+                    alert("An error happened try again later !!!");
+                }
+            });
+            }
+        });
+    }
+
+</script>

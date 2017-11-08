@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Conference Check In</title>
+    <!--non custom scripts-->
+    
+    <script src="Scripts/moment.js"></script>
+    <script src="Scripts/ractive-v0.7.2.js"></script>
+    <!--ejgrid scripts-->
+    <script src="Scripts/jquery-1.11.1.min.js"></script>
+    <script src="Scripts/jquery.easing.1.3.js"></script>
+    <script src="Scripts/globalize.js"></script>
+    <script src="Scripts/jsrender.min.js"></script>
+    <script src="Scripts/ej.web.all.min.js"></script>
+
+    <!--Css calls-->
+    
+    <link href="Content/ej/web/default-theme/ej.widgets.all.min.css" rel="stylesheet" />
+    <link href="Content/ej/web/responsive-css/ejgrid.responsive.css" rel="stylesheet" />
+	  <link href="Css/ej.widgets.core.min.css" rel="stylesheet" />
+    <link href="Css/ej.theme.min.css" rel="stylesheet" />
+    <link href="Css/w3-full.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="Css/style.css" rel="stylesheet" />
+
+
+  </head>
+  <body>
+   <main> </main>
+
+   <script>
+      // all the main scripts--
+      var Login = $.ajax({
+            url: 'Templates/Login.html',
+            async: false
+        }).responseText;
+        var main_menu = $.ajax({
+            url: 'Templates/MainMenu.html',
+            async: false
+        }).responseText;
+        var profile = $.ajax({
+            url: 'Templates/profile.html',
+            async: false
+        }).responseText;
+        var conference = $.ajax({
+            url: 'Templates/Conference.html',
+            async: false
+        }).responseText;
+        var checkIn = $.ajax({
+            url: 'Templates/CheckIn.html',
+            async: false
+        }).responseText;
+        var register = $.ajax({
+            url: 'Templates/Register.html',
+            async: false
+        }).responseText;
+        var Admin = $.ajax({
+            url: 'Templates/admin.html',
+            async: false
+        }).responseText;
+        var mystats = $.ajax({
+            url: 'Templates/mystats.html',
+            async: false
+        }).responseText;
+        
+        // login page 
+        var ractive = new Ractive({
+          el: 'main',
+          template: Login
+       });
+
+       
+       function ShowMainMenu(data){
+         var ractive = new Ractive({
+          el: 'main',
+          template: main_menu,
+          init: function (options) {
+            
+          },
+          data: {user : data}
+       });
+       }
+
+       function ShowMainMenuNotAdmin(data){
+         var ractive = new Ractive({
+          el: 'main',
+          template: main_menu,
+          init: function (options) {
+              //alert(data.IsAdmin);
+            $('#Admin_checkIn').hide();
+            $('#ManageConference').hide();
+            $('#adminstats').hide();
+          },
+          data: {user : data}
+       });
+       }
+
+       
+   </script>
+
+   <script> 
+       function IsAlreadyRegistered(val1, val2) {
+           var value = val1 + '-' + val2;
+        var answer = 12;
+        $.ajax({
+                    async: false,
+                    cache: false,
+                    type: "Get",
+                    url: "/CheckIn/" + value,
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function(data) {
+                        answer = data.length
+                    },
+                    error: function(error) {
+                        alert("An error happened try again later !!!");
+                    }
+               });
+        return answer;
+               }
+   </script>
+  </body>
+</html>

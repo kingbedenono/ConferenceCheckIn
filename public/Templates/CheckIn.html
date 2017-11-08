@@ -1,0 +1,115 @@
+ <script type="application/x-javascript" src="Scripts/bridgeit.js"></script>
+ <script type="text/javascript">
+$('#myId').hide();
+function onAfterCaptureScan(event)  {
+    var text = event.value;
+    val = document.getElementById("Conferencess").value;
+    $('#myId').val(text);
+}
+
+function tttt(){
+    //val3 = IsAlreadyRegistered(val,val2);
+    val3 = $('#myId').val();
+       alert(val3);
+}
+</script>
+
+
+<center>
+    <select id="Conferencess">
+    </select>
+    <input type = "text" id ="myId" onchange="tttt()" disabled/>
+    <button class="w3-button w3-blue w3-mobile w3-topbar w3-bottombar w3-border-blue" onclick="bridgeit.scan('scanBtn', 'onAfterCaptureScan');" >Scan to Sign in</button>
+    <button class="w3-button w3-green w3-mobile w3-topbar w3-bottombar w3-border-red" onclick="tto()" >Mobile Sing in</button>
+
+    <br>   <br>   <br> 
+    
+    <p> For computer use only !!!</p>  
+    <label>Participant Id : </label> <input type="number" id="person_id" placeholder="Enter the person id" />
+    
+    <button class="w3-button w3-green w3-mobile w3-topbar w3-bottombar w3-border-red" onclick="tt()" >Sign the person In</button>
+    
+</center>
+
+<script>
+    function tt(){
+        val = document.getElementById("Conferencess").value
+        val2 = $('#person_id').val();
+        val3 = IsAlreadyRegistered(val2,val);
+        if(val != 0){
+            if(val3 > 0){
+                value = val2 + '-' + val;
+                CheckInToDb(value);
+            }else{
+                alert("you have not register for this conference")
+            }
+        }else{
+            alert("please select a conference");
+        }
+    }
+    </script>
+
+    <script>
+        function CheckInToDb(value){
+          
+        $.ajax({
+                async: false,
+                cache: false,
+                type: "Put",
+                url: "/CheckIn/" + value
+             //   dataType: 'json',
+             //   contentType: "application/json",
+              //  success: function(data) {
+              //      alert("Check In completed !!!");
+               //     CheckIn();
+              //  },
+              //  error: function(error) {
+                //    alert("An error happened try again later !!!");
+               // }
+            });
+            alert("Check In completed !!!");
+                   // CheckIn();
+
+
+        }
+
+        
+    </script>
+
+    <script>
+        function CheckInToDb(value){
+            alert(value);
+            $.ajax({
+                async: false,
+                cache: false,
+                type: "Put",
+                url: "/CheckIn/" + value,
+             //   dataType: 'json',
+             //   contentType: "application/json",
+                success: function(data) {
+                    alert("Check In completed !!!");
+                    CheckIn();
+                },
+                error: function(error) {
+                    alert("An error happened try again later !!!");
+                }
+            });
+        }
+    </script>
+    <script>
+        function tto(){
+        val = document.getElementById("Conferencess").value
+        val2 = $('#myId').val();
+        val3 = IsAlreadyRegistered(val2,val);
+        if(val != 0){
+            if(val3 > 0){
+                value = val2 + '-' + val;
+                CheckInToDb(value);
+            }else{
+                alert("you have not register for this conference")
+            }
+        }else{
+            alert("please select a conference");
+        }
+    }
+    </script>

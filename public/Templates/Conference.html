@@ -1,0 +1,63 @@
+<center>
+    <br/><br/>
+    <div id="showConf"></div>
+</center>
+<script id="tabGridContents" type="text/x-jsrender">
+    <div id="gridTab">
+        <div id="detailGrid">
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    function Goreg(){
+        obj = $("#showConf").ejGrid("instance"); 
+        rowdata = obj.getSelectedRecords()[0];
+        var creator = $('#id_to_hide').text();
+        var value = creator + '-' + rowdata.conference_id + '-' + rowdata.Place_available; 
+        if(rowdata.Place_available > 0) {
+            valtest = IsAlreadyRegistered(creator,rowdata.conference_id) ;
+            if(valtest < 1){
+                $.ajax({
+                            async: false,
+                            cache: false,
+                            type: "Post",
+                            url: "/CheckIn/" + value,
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function(data) {
+                                updatePlaceAvailable(rowdata.conference_id);
+                                alert("registration completed !!!");
+                                ConferenceList();
+                            },
+                            error: function(error) {
+                                alert("An error happened try again later !!!");
+                            }
+                    });
+            }else{
+                alert("you have already register !!!")
+            }
+        }else{
+            alert("There is no more place available in this conference")
+        }
+    }
+</script>
+
+<script>
+    function updatePlaceAvailable(val){
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "Put",
+            url: "/admin/" + val,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+            }
+        })
+}
+</script>

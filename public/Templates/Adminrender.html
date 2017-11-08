@@ -1,0 +1,91 @@
+{{#with user}}
+<div class="w3-row w3-mobile " style="width : 60%">
+    <p>
+        <label class="w3-text-brown"><b>conference_id</b></label>
+        <input id="Adminconf_id" class="w3-input w3-border w3-sand w3-animate-input" style="width:80%" type="text"  value={{conference_id}} disabled>
+        <p>
+            <label class="w3-text-brown"><b>Conference Name</b></label>
+            <input id="Adminconf_name" class="w3-input w3-border w3-sand w3-animate-input" style="width:80%" type="text" placeholder="Conference name" value={{Conference_name}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Date</b></label>
+            <input id="adminconfDate" class="w3-input w3-border w3-sand w3-animate-input" style="width:100%" type="text" placeholder="Date" value={{Date}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Start time</b></label>
+            <input id="Adminconf_start_time" class="w3-input w3-border w3-sand w3-animate-input" type="text" style="width:80%" placeholder="Start time" value={{Start_time}}></p>
+        <p>
+            <label class="w3-text-brown"><b>End time</b></label>
+            <input id="Adminconf_end_time" class="w3-input w3-border w3-sand w3-animate-input" type="text" style="width:80%" placeholder="End time" value={{End_time}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Guest speaker</b></label>
+            <input id="Adminconf_guest_speaker" class="w3-input w3-border w3-sand w3-animate-input" type="text" style="width:80%" placeholder="Guest speaker" value={{Guest_speaker}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Location</b></label>
+            <input id="Adminconf_location" class="w3-input w3-border w3-sand w3-animate-input" type="text" style="width:80%" placeholder="Location" value={{Location}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Organiser</b></label>
+            <input id="Adminconf_organiser" class="w3-input w3-border w3-sand w3-animate-input" type="text" style="width:80%" placeholder="Organiser" value={{Organiser}}></p>
+       <p>
+            <label class="w3-text-brown"><b>Place available</b></label>
+            <input id="Adminconf_name1" class="w3-input w3-border w3-sand w3-animate-input" style="width:80%" type="number" placeholder="Place_available" value={{Place_available}}></p>
+        <p>
+            <label class="w3-text-brown"><b>Description</b></label>
+            <textarea id="Adminconf_description" class="w3-input w3-border w3-sand w3-animate-input" style="width:80%"> {{Description}}</textarea></p>
+        <button onclick="SendConfToDb()" class="w3-button w3-blue w3-mobile w3-topbar w3-bottombar w3-border-red">
+       <img src="images/save.png" class="w3-image" alt="Submit">
+    </button>
+
+</div>
+<script>
+    function SendConfToDb() {
+        var value = $('#Adminconf_id').val() + '-' + $('#Adminconf_name').val() + '-' + $('#adminconfDate').val().replace("/", "q").replace("/", "q").replace("/", "q") + '-' + $('#Adminconf_start_time').val().trim() + '-' + $('#Adminconf_end_time').val().trim() + '-' + $('#Adminconf_guest_speaker').val() + '-' + $('#Adminconf_location').val() + '-' + $('#Adminconf_organiser').val();
+        value =value + '-' + $('#Adminconf_name1').val() + '-' + $('#Adminconf_description').val() ;
+        if ($('#Adminconf_id').val() == 0) {
+            addConf(value);
+        } else {
+            UpdateConf(value);
+        }
+    }
+</script>
+
+<script>
+    function addConf(val) {
+        var creator = $('#id_to_hide').text();
+        var value = val + '-' + creator;
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "Post",
+            url: "/Adminconf/" + value,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                alert("Conference Added !!!!");
+                ConferenceList();
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+            }
+        })
+    }
+
+    function UpdateConf(val) {
+        $.ajax({
+            async: false,
+            cache: false,
+            type: "PUT",
+            url: "/Adminconf/" + val,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                ConferenceList();
+                alert("Conference Updated !!!!");
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+                //ConferenceList();
+            }
+
+        })
+    }
+</script>
+{{/with}}

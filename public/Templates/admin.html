@@ -1,0 +1,93 @@
+<center>
+    <select id="adminmenu" onchange = "AddorUpdate()">
+        <option value ="nothing" selected>Select... </option>
+        <option value ="add" >Add a new Conference</option>
+        <option value ="upd">Update existing conference </option>
+    </select>
+    <br> <br> 
+    <div id="myConfs">
+        <select id = "UpdateConfS" onchange="getConfDetails()">
+        </select>
+    </div>
+</center>
+<admin-container></admin-container>
+<script>
+$('#myConfs').hide();
+var creator = $('#id_to_hide').text();
+$.ajax({
+            async: false,
+            cache: false,
+            type: "Get",
+            url: "/Adminconf/" + creator,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                $('#UpdateConfS').find('option').remove().end();
+                $('#UpdateConfS').append($('<option>', {
+                            value: 0,
+                            text: "Select one..."
+                        }));
+                    for (i = 0; i < data.length; i++) {
+                        $('#UpdateConfS').append($('<option>', {
+                            value: data[i].conference_id,
+                            text: data[i].Conference_name + "  @  " + data[i].Date
+                        }));
+                    }
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+                //ConferenceList();
+            }
+
+        });
+    var adminrender = $.ajax({
+            url: 'Templates/Adminrender.html',
+            async: false
+        }).responseText;
+    function AddorUpdate(){
+            var x = document.getElementById("adminmenu").value;
+            if (x == "add"){
+                $('#myConfs').hide();
+                var newdata = {"conference_id" : 0}
+                var ractive = new Ractive({
+                            el: 'admin-container',
+                            template: adminrender,
+                            init: function (options) {
+                                $("#adminconfDate").ejDatePicker({width:"80%"});
+                            },
+                            data: {user : newdata}
+                            });
+            }else if (x == "upd"){
+                $('#myConfs').show();
+            }
+        }
+
+        function getConfDetails(){
+            var x = document.getElementById("UpdateConfS").value;
+            if(x != 0){
+            $.ajax({
+            async: false,
+            cache: false,
+            type: "Get",
+            url: "/conf/" + x,
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data) {
+                var ractive = new Ractive({
+                            el: 'admin-container',
+                            template: adminrender,
+                            init: function (options) {
+                                $("#adminconfDate").ejDatePicker({width:"80%", value: new Date(data[0].Date)});
+                            },
+                            data: {user : data[0]}
+                            });
+            },
+            error: function(error) {
+                alert("An error happened try again later !!!");
+                //ConferenceList();
+            }
+
+        });
+        }
+        }
+</script>
