@@ -8,7 +8,7 @@ var TYPES = require('tedious').TYPES;
 var config = {
     server: '\localhost',
 userName: 'nono',
-password: 'kokou2008',
+password: 'password',
 options: {
 database: 'Conference',
 //trustedConnection: true
